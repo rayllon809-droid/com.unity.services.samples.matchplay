@@ -1,0 +1,69 @@
+import pygame
+import random
+
+# Configurações iniciais
+pygame.init()
+LARGURA, ALTURA = 400, 600
+tela = pygame.display.set_mode((LARGURA, ALTURA))
+pygame.display.set_caption("Pulo do Bloco")
+
+# Cores
+BRANCO = (255, 255, 255)
+PRETO = (0, 0, 0)
+VERDE = (0, 255, 0)
+AZUL = (0, 100, 255)
+
+# Variáveis do Jogador
+player_tam = 30
+player_x = LARGURA // 2
+player_y = ALTURA - 100
+vel_y = 0
+gravidade = 0.8
+pulo_forca = -16
+
+# Plataformas (x, y, largura, altura)
+plataformas = [[LARGURA // 2 - 25, ALTURA - 50, 60, 10]]
+for i in range(6):
+    x = random.randint(0, LARGURA - 60)
+    y = random.randint(i * 100, (i + 1) * 100)
+    plataformas.append([x, y, 60, 10])
+
+rodando = True
+clock = pygame.time.Clock()
+
+while rodando:
+    tela.fill(BRANCO)
+    
+    for evento in pygame.event.get():
+        if evento.type == pygame.QUIT:
+            rodando = False
+
+    # Movimentação Lateral
+    teclas = pygame.key.get_pressed()
+    if teclas[pygame.K_LEFT] and player_x > 0:
+        player_x -= 7
+    if teclas[pygame.K_RIGHT] and player_x < LARGURA - player_tam:
+        player_x += 7
+
+    # Gravidade e Movimento Vertical
+    vel_y += gravidade
+    player_y += vel_y
+
+    # Colisão com Plataformas (apenas quando está caindo)
+    if vel_y > 0:
+        for p in plataformas:
+            if (player_x + player_tam > p[0] and player_x < p[0] + p[2] and
+                player_y + player_tam > p[1] and player_y + player_tam < p[1] + p[3] + 10):
+                vel_y = pulo_forca
+
+    # Rolagem da Tela (Efeito de subir)
+    if player_y < ALTURA // 3:
+        player_y = ALTURA // 3
+        for p in plataformas:
+            p[1] -= vel_y
+            if p[1] > ALTURA:
+                p[1] = random.randint(-50, 0)
+                p[0] = random.randint(0, LARGURA - 60)
+
+    # Game Over
+    if player_y >
